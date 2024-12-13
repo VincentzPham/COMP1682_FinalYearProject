@@ -13,9 +13,9 @@
 - [Resources](#resources)
 
 ## Introduction
-This is my final project focusing on environmental problems. We apply Machine Learning and Deep Learning algorithms to predict global temperature, greenhouse gas emissions, and CO₂ emissions from fossil fuels.
+This is my final project focusing on environmental problems. I apply Machine Learning and Deep Learning algorithms to predict global temperature, greenhouse gas emissions, and CO₂ emissions from fossil fuels.
 
-**Harnessing Machine Learning and Deep Learning for Environmental Solutions** is a comprehensive project aimed at leveraging advanced computational techniques to forecast key environmental indicators. By employing ML and DL algorithms, this project seeks to provide precise predictions of global temperature trends, greenhouse gas emissions, and CO₂ emissions from fossil fuels. These predictions can aid governments, organizations, and researchers in making informed decisions to combat climate change and promote sustainable practices.
+**Harnessing Machine Learning and Deep Learning for Environmental Solutions** aims to leverage advanced computational techniques to forecast key environmental indicators such as global temperature trends, greenhouse gas emissions, and CO₂ emissions from fossil fuels.
 
 ### Objectives
 
@@ -28,12 +28,23 @@ This is my final project focusing on environmental problems. We apply Machine Le
 
 The integration of ML and DL in environmental science offers the potential to revolutionize how we understand and address climate-related issues. Predictive models can forecast future scenarios based on current and historical data, enabling proactive measures rather than reactive responses. This project not only contributes to the academic field but also provides practical tools for real-world applications in environmental management and policy formulation.
 
-By advancing the accuracy and reliability of environmental predictions, this project supports the global effort to mitigate the adverse effects of climate change, ultimately contributing to a more sustainable and resilient future after.
+By advancing the accuracy and reliability of environmental predictions, this project supports the global effort to mitigate the adverse effects of climate change, ultimately contributing to a more sustainable and resilient future.
 
 ## Datasets
-1. **Global Temperature:** Data sourced from [FAO](https://www.fao.org/faostat/en/#data/ET).
-2. **Greenhouse Gas:** Data sourced from [Kaggle](https://www.kaggle.com/datasets/unitednations/international-greenhouse-gas-emissions).
-3. **Fossil Fuels CO₂ Emissions:** Data sourced from [Datahub](https://datahub.io/core/co2-fossil-by-nation).
+1. **Global Temperature:** 
+    - **Source:** Data sourced from [FAO](https://www.fao.org/faostat/en/#data/ET).
+    - **Description:** Contains historical global temperature records spanning from 1961 to 2023.
+    - **Key Features:** Monthly average temperatures, regional breakdowns, etc.
+
+2. **Greenhouse Gas:** 
+    - **Source:** Data sourced from [Kaggle](https://www.kaggle.com/datasets/unitednations/international-greenhouse-gas-emissions).
+    - **Description:** Contains historical Greenhouse Gas records spanning from 1990 to 2014.
+    - **Key Features:** Yearly values, regional breakdowns, kind of GHG emissions, etc.
+
+3. **Fossil Fuels CO₂ Emissions:** 
+    - **Source:** Data sourced from [Datahub](https://datahub.io/core/co2-fossil-by-nation).
+    - **Description:** Contains historical Fossil Fuels CO2 Emissions records spanning from 1751 to 2014.
+    - **Key Features:** Yearly values, regional breakdowns, kind of fossil fuels, etc.
 
 In this project, I work with numerical and time series data relevant to environmental metrics.
 
