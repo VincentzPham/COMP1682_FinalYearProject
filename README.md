@@ -28,7 +28,7 @@ This is my final project focusing on environmental problems. We apply Machine Le
 
 The integration of ML and DL in environmental science offers the potential to revolutionize how we understand and address climate-related issues. Predictive models can forecast future scenarios based on current and historical data, enabling proactive measures rather than reactive responses. This project not only contributes to the academic field but also provides practical tools for real-world applications in environmental management and policy formulation.
 
-By advancing the accuracy and reliability of environmental predictions, this project supports the global effort to mitigate the adverse effects of climate change, ultimately contributing to a more sustainable and resilient future.
+By advancing the accuracy and reliability of environmental predictions, this project supports the global effort to mitigate the adverse effects of climate change, ultimately contributing to a more sustainable and resilient future after.
 
 ## Datasets
 1. **Global Temperature:** Data sourced from [FAO](https://www.fao.org/faostat/en/#data/ET).
