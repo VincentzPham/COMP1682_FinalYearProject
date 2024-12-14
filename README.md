@@ -75,10 +75,10 @@ Data preprocessing is a crucial step to ensure the quality and reliability of th
 
 ### 1. Global Temperature
 #### Handling Missing Values
-In the Global Temperature dataset, some quarterly data points were missing. To address this, I computed the missing quarterly temperature (`$x_4$`) by taking the average of the three corresponding monthly temperatures (`$x_1$`, `$x_2$`, `$x_3$`). The formula used is:
+In the Global Temperature dataset, some quarterly data points were missing. To address this, I computed the missing quarterly temperature (`x_4`) by taking the average of the three corresponding monthly temperatures (`x_1`, `x_2`, `x_3`). The formula used is:
 
 $$
-$x_4$ = \frac{x_1 + x_2 + x_3}{3}
+x_4 = \frac{x_1 + x_2 + x_3}{3}
 $$
 
 **Where:**
