@@ -36,14 +36,17 @@ if main_tab != "Select...":
     st.sidebar.title(f"{main_tab} Menu")
     sub_tab = st.sidebar.selectbox(
         "Select an Analysis Type",
-        ["Select...", "Explore", "Analysis", "Train Model"]
+        ["Select...", "Introduction", "Explore", "Analysis", "Train Model"]
     )
 
 # Add a GO button
 if main_tab != "Select..." and sub_tab != "Select...":
     if st.sidebar.button("GO"):
         if main_tab == "CO2 Emissions":
-            if sub_tab == "Explore":
+            if sub_tab == "Introduction":
+                st.write("### Introduction CO2 Emissions Data")
+                run_sub_app("./CO2 Emissions/UI/streamlit_introCO2.py") 
+            elif sub_tab == "Explore":
                 st.write("### Exploring CO2 Emissions Data")
                 run_sub_app("./CO2 Emissions/UI/streamlit_explore.py")
             elif sub_tab == "Analysis":
@@ -54,7 +57,10 @@ if main_tab != "Select..." and sub_tab != "Select...":
                 run_sub_app("./CO2 Emissions/UI/streamlit_app_final.py")
         
         elif main_tab == "GHG":
-            if sub_tab == "Explore":
+            if sub_tab == "Introduction":
+                st.write("### Introduction GHG Data")
+                run_sub_app("./GHG/UI/streamlit_introGHG.py")
+            elif sub_tab == "Explore":
                 st.write("### Exploring GHG Data")
                 run_sub_app("./GHG/UI/streamlit_explore.py")
             elif sub_tab == "Analysis":
@@ -65,7 +71,10 @@ if main_tab != "Select..." and sub_tab != "Select...":
                 run_sub_app("./GHG/UI/streamlit_app.py")
         
         elif main_tab == "Global Temperature":
-            if sub_tab == "Explore":
+            if sub_tab == "Introduction":
+                st.write("### Introduction Global Temperature Data")
+                run_sub_app("./Global Temperature/UI/streamlit_introGloTemp.py")
+            elif sub_tab == "Explore":
                 st.write("### Exploring Global Temperature Data")
                 run_sub_app("./Global Temperature/UI/streamlit_explore.py")
             elif sub_tab == "Analysis":

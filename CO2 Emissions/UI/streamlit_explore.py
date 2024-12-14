@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Set Streamlit page configuration
-st.set_page_config(page_title="CO2 Emissions Analysis", layout="wide")
+st.set_page_config(page_title="CO2 Emissions Explore", layout="wide")
 
 # Function Definitions
 def load_data(file_path):

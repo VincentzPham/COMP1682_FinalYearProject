@@ -85,32 +85,16 @@ $$
 - **x1, x2, x3:** Temperatures for the individual months within the quarter.
 - **x4:** Average temperature for the quarter.
 
-**Steps Implemented:**
-- **Correlation Analysis:** Analyzed the correlation between individual monthly temperatures and the quarterly average. The high correlation indicated that averaging the three months would be a reliable method for imputing missing quarterly values.
-- **Imputation:** For each missing quarterly temperature, calculated the mean of the available monthly temperatures (`x1`, `x2`, `x3`) and assigned it to `x4`.
-
-#### Data Normalization
-To ensure that all features contribute equally to the model's performance, I normalized the numerical data using **Min-Max Scaling**. This scales the data to a fixed range, typically [-1, 1].
-
-#### Feature Engineering
-- **Time Features:** Extracted additional time-based features like month, quarter, and year to help the model capture seasonal patterns.
-- **Lag Features:** Created lagged versions of the target variables to incorporate past information into the current prediction.
+- **Normalization:** Applied Min-Max Scaling for feature normalization.
+- **Feature Engineering:** Added time-based features like month, quarter, and year, and created lag features for target variables.
 
 ### 2. Greenhouse Gas
-#### Data Normalization
-Normalized the numerical data using **MinMaxScaler** to center the data around the mean with a unit standard deviation. This is particularly useful for algorithms that assume normally distributed data.
-
-#### Feature Engineering
-- **Time Features:** Partitioned the data by year to capture annual trends.
-- **No Quarterly Data:** Since the dataset is partitioned by year, there is no need to create quarterly features.
+- **Normalization:** Used MinMaxScaler for feature scaling.
+- **Feature Engineering:** Partitioned data by year to capture annual trends.
 
 ### 3. Fossil Fuels CO₂ Emissions
-#### Data Normalization
-Applied **Min-Max Scaling** to normalize the emission values, ensuring all features are on the same scale for effective model training.
-
-#### Feature Engineering
-- **Time Features:** Partitioned the data by year to focus on annual emission trends.
-- **No Quarterly Data:** Similar to the Greenhouse Gas dataset, there is no quarterly data to process.
+- **Normalization:** Applied Min-Max Scaling for feature normalization.
+- **Feature Engineering:** Partitioned data by year to focus on annual emission trends.
 
 ## Time Series Analysis
 I implement the following Time Series Analysis approaches:
@@ -120,7 +104,7 @@ I implement the following Time Series Analysis approaches:
 - **Augmented Dickey-Fuller Test (ADF Test)**
 - **ACF/PACF Plots**
 
-## Machine Learning Models
+## Time Series Models
 - **ARIMA:** Autoregressive Integrated Moving Average.
 - **SARIMA:** Seasonal ARIMA.
 - **Exponential Smoothing:** A method for smoothing time series data.
