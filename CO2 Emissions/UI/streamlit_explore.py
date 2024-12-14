@@ -18,21 +18,67 @@ def load_data(file_path):
         st.error(f"File not found: {file_path}")
         return None
 
+def summarize_data(df):
+    df
+    """Summarize the dataset with rows, columns, and column information."""
+    num_rows, num_columns = df.shape
+    st.write(f"**Number of rows:** {num_rows}")
+    st.write(f"**Number of columns:** {num_columns}")
+    column_info = df.dtypes.to_frame(name='Data Type').join(df.nunique().to_frame(name='Unique Values'))
+    column_info.reset_index(inplace=True)
+    column_info.columns = ['Column Name', 'Data Type', 'Unique Values']
+    column_info['Category'] = column_info.apply(
+        lambda row: classify_column(row['Column Name'], row['Data Type'], row['Unique Values'], num_rows),
+        axis=1
+    )
+    st.write("### Column Information")
+    st.dataframe(column_info)
+    return num_rows, num_columns, column_info
+
+def classify_column(col_name, data_type, unique_values, num_rows):
+    """Classify columns as Categorical or Numerical."""
+    if data_type == 'object':
+        return 'Categorical'
+    elif data_type in ['int64', 'float64']:
+        if unique_values < 0.05 * num_rows:
+            return 'Categorical'
+        else:
+            return 'Numerical'
+    else:
+        return 'Categorical'
+
+def check_missing_values(df):
+    """Check and visualize missing values."""
+    missing_values = df.isnull().sum()
+    st.write("### Missing Values")
+    st.write(missing_values[missing_values > 0])
+    if missing_values.sum() > 0:
+        plt.figure(figsize=(8, 5))
+        sns.barplot(x=missing_values.index[missing_values > 0], y=missing_values[missing_values > 0], palette='Reds')
+        plt.title('Missing Values per Column')
+        plt.ylabel('Count')
+        plt.xlabel('Columns')
+        plt.xticks(rotation=45, ha='right')
+        st.pyplot(plt)
+    else:
+        st.write("No missing values detected.")
+
 def plot_mean_emissions_per_year(df):
-    """Plots the mean CO2 emissions over the years."""
+    """Plots the mean Total CO2 emissions over the years."""
     mean_emissions_per_year = df.groupby('Year')['Total'].mean()
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(mean_emissions_per_year.index, mean_emissions_per_year.values, linewidth=2, marker='o')
-    ax.set_xlabel('Year')
-    ax.set_ylabel('Mean CO2 Emissions')
-    ax.set_title('Trend of Mean CO2 Emissions Over the Years')
+    fig, ax = plt.subplots(figsize=(8, 3))
+    ax.plot(mean_emissions_per_year.index, mean_emissions_per_year.values)
+    ax.set_xlabel('Year', fontsize=6)
+    ax.set_ylabel('Mean CO2 Emissions', fontsize=6)
+    ax.set_title('Trend of Mean CO2 Emissions Over the Years', fontsize=6)
     ax.grid(True)
     st.pyplot(fig)
-
+    
+    
 def plot_total_emissions_by_continent(df):
     """Plots total CO2 emissions by continent over time."""
     data_grouped_by_continent_year = df.groupby(['Year', 'Continent'])['Total'].sum().unstack()
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(8, 3))
     data_grouped_by_continent_year.plot(ax=ax, linewidth=2)
     ax.set_xlabel('Year')
     ax.set_ylabel('Total CO2 Emissions (in thousands of metric tons)')
@@ -79,7 +125,7 @@ def plot_emissions_by_country_in_continent(df):
                 st.warning(f"No data available for continent: {continent}")
                 continue
             
-            fig, ax = plt.subplots(figsize=(14, 8))
+            fig, ax = plt.subplots(figsize=(12, 8))
             emissions_by_country.plot(ax=ax, linewidth=2)
             ax.set_xlabel('Year')
             ax.set_ylabel('Total CO2 Emissions (in thousands of metric tons)')
@@ -90,7 +136,7 @@ def plot_emissions_by_country_in_continent(df):
             st.pyplot(fig)
     else:
         # Vẽ biểu đồ cho các châu lục đã chọn trong một biểu đồ duy nhất
-        fig, ax = plt.subplots(figsize=(14, 8))
+        fig, ax = plt.subplots(figsize=(8, 6))
         for continent in selected_continents:
             continent_data = filtered_df[filtered_df['Continent'] == continent]
             emissions_by_country = continent_data.groupby(['Year', 'Country'])['Total'].sum().unstack()
@@ -108,7 +154,7 @@ def plot_emissions_by_country_in_continent(df):
 def plot_emission_trends_by_source(df):
     """Plots trends of emissions by source over the years."""
     emissions_by_year = df.groupby('Year')[['Solid Fuel', 'Liquid Fuel', 'Gas Fuel', 'Cement', 'Gas Flaring']].sum()
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(8, 4))
     emissions_by_year.plot(ax=ax, linewidth=2)
     ax.set_xlabel('Year')
     ax.set_ylabel('Total Emissions (in thousands of metric tons)')
@@ -121,12 +167,12 @@ def plot_emission_trends_by_source(df):
 def plot_emissions_by_continent_and_source(df):
     """Plots total emissions by source for each continent."""
     emissions_by_continent = df.groupby('Continent')[['Solid Fuel', 'Liquid Fuel', 'Gas Fuel', 'Cement', 'Gas Flaring', 'Bunker fuels (Not in Total)']].sum()
-    fig, ax = plt.subplots(figsize=(14, 8))
+    fig, ax = plt.subplots(figsize=(8, 6))
     emissions_by_continent.plot(kind='bar', ax=ax)
     ax.set_xlabel('Continent')
     ax.set_ylabel('Total Emissions (in thousands of metric tons)')
     ax.set_title('Total Emissions by Source for Each Continent')
-    ax.legend(title='Source')
+    ax.legend(title='Source', fontsize='small', title_fontsize='medium')
     fig.tight_layout()
     st.pyplot(fig)
 
@@ -161,7 +207,7 @@ def descriptive_statistics(df):
 def plot_correlation_heatmap(df):
     """Plots a heatmap of correlations between emission variables."""
     correlation_matrix = df[['Solid Fuel', 'Liquid Fuel', 'Gas Fuel', 'Cement', 'Gas Flaring', 'Bunker fuels (Not in Total)']].corr()
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(8, 3))
     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=.5, ax=ax)
     ax.set_title('Correlation Heatmap of CO2 Emission Variables')
     st.pyplot(fig)
@@ -176,7 +222,7 @@ def analyze_calculated_vs_reported_totals(df):
     st.subheader("9. Analysis of Calculated vs Reported Totals")
     st.write(f"**Correlation between Reported Total and Calculated Total:** {correlation:.4f}")
     
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(8, 4))
     ax.scatter(df['Calculated Total'], df['Total'], alpha=0.6, color='teal')
     ax.set_title('Calculated Total from 5 Fuels vs Reported Total')
     ax.set_xlabel('Calculated Total (Sum of components)')
@@ -200,6 +246,10 @@ def main():
     df = load_data(DATA_FILE)
     
     if df is not None:
+        summarize_data(df)
+        
+        check_missing_values(df)
+        
         st.header("1. Mean CO2 Emissions Over the Years")
         plot_mean_emissions_per_year(df)
         

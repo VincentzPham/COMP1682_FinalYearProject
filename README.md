@@ -78,12 +78,12 @@ Data preprocessing is a crucial step to ensure the quality and reliability of th
 In the Global Temperature dataset, some quarterly data points were missing. To address this, I computed the missing quarterly temperature (`x4`) by taking the average of the three corresponding monthly temperatures (`x1`, `x2`, `x3`). The formula used is:
 
 $$
-x4 = \frac{x1 + x2 + x3}{3}
+x4 = \frac{$x_1$ + $x_2$ + $x_3$}{3}
 $$
 
 **Where:**
-- **x1, x2, x3:** Temperatures for the individual months within the quarter.
-- **x4:** Average temperature for the quarter.
+- **$x_1$, $x_2$, $x_3$:** Temperatures for the individual months within the quarter.
+- **$x_4$:** Average temperature for the quarter.
 
 - **Normalization:** Applied Min-Max Scaling for feature normalization.
 - **Feature Engineering:** Added time-based features like month, quarter, and year, and created lag features for target variables.
