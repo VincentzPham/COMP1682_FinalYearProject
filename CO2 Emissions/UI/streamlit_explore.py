@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.cm as cm
+from scipy.stats import boxcox
 
 # Set Streamlit page configuration
 st.set_page_config(page_title="CO2 Emissions Explore", layout="wide")
@@ -12,6 +14,9 @@ def load_data(file_path):
     """Loads the dataset and returns a DataFrame."""
     try:
         df = pd.read_csv(file_path)
+        df['Year'] = pd.to_datetime(df['Year'], format='%Y')
+        # df['Year'] = df['Year'].dt.year
+
         st.success(f"Data loaded successfully from {file_path}")
         return df
     except FileNotFoundError:
@@ -19,7 +24,7 @@ def load_data(file_path):
         return None
 
 def summarize_data(df):
-    df
+    st.write(df)
     """Summarize the dataset with rows, columns, and column information."""
     num_rows, num_columns = df.shape
     st.write(f"**Number of rows:** {num_rows}")
@@ -47,21 +52,15 @@ def classify_column(col_name, data_type, unique_values, num_rows):
     else:
         return 'Categorical'
 
+def describe_values(df):
+    st.write("### Descriptive statitics")
+    st.write(df.describe())
+
 def check_missing_values(df):
     """Check and visualize missing values."""
     missing_values = df.isnull().sum()
     st.write("### Missing Values")
-    st.write(missing_values[missing_values > 0])
-    if missing_values.sum() > 0:
-        plt.figure(figsize=(8, 5))
-        sns.barplot(x=missing_values.index[missing_values > 0], y=missing_values[missing_values > 0], palette='Reds')
-        plt.title('Missing Values per Column')
-        plt.ylabel('Count')
-        plt.xlabel('Columns')
-        plt.xticks(rotation=45, ha='right')
-        st.pyplot(plt)
-    else:
-        st.write("No missing values detected.")
+    st.write(missing_values)
 
 def plot_mean_emissions_per_year(df):
     """Plots the mean Total CO2 emissions over the years."""
@@ -73,6 +72,10 @@ def plot_mean_emissions_per_year(df):
     ax.set_title('Trend of Mean CO2 Emissions Over the Years', fontsize=6)
     ax.grid(True)
     st.pyplot(fig)
+    
+    st.markdown("""
+    Conclusion: Average CO2 emissions have increased steadily over the years, especially since the mid-20th century. This shows that humans are using more and more fossil fuels, affecting the environment.
+                """)
     
     
 def plot_total_emissions_by_continent(df):
@@ -100,7 +103,7 @@ def plot_emissions_by_country_in_continent(df):
     selected_continents = st.multiselect(
         "Select Continent(s) to Display:",
         options=continents,
-        default=["All"]
+        default=["North America"]
     )
     
     if "All" in selected_continents:
@@ -136,7 +139,7 @@ def plot_emissions_by_country_in_continent(df):
             st.pyplot(fig)
     else:
         # Vẽ biểu đồ cho các châu lục đã chọn trong một biểu đồ duy nhất
-        fig, ax = plt.subplots(figsize=(8, 6))
+        fig, ax = plt.subplots(figsize=(12, 8))
         for continent in selected_continents:
             continent_data = filtered_df[filtered_df['Continent'] == continent]
             emissions_by_country = continent_data.groupby(['Year', 'Country'])['Total'].sum().unstack()
@@ -153,7 +156,7 @@ def plot_emissions_by_country_in_continent(df):
 
 def plot_emission_trends_by_source(df):
     """Plots trends of emissions by source over the years."""
-    emissions_by_year = df.groupby('Year')[['Solid Fuel', 'Liquid Fuel', 'Gas Fuel', 'Cement', 'Gas Flaring']].sum()
+    emissions_by_year = df.groupby('Year')[['Solid Fuel', 'Liquid Fuel', 'Gas Fuel', 'Cement', 'Gas Flaring', 'Bunker fuels (Not in Total)']].sum()
     fig, ax = plt.subplots(figsize=(8, 4))
     emissions_by_year.plot(ax=ax, linewidth=2)
     ax.set_xlabel('Year')
@@ -162,6 +165,28 @@ def plot_emission_trends_by_source(df):
     ax.legend(title='Source', bbox_to_anchor=(1.05, 1), loc='upper left')
     ax.grid(True)
     fig.tight_layout()
+    st.pyplot(fig)
+
+def plot_continent_frequency(df):
+    # Tạo figure
+    fig = plt.figure(figsize=(8, 3)) 
+
+    # Lấy giá trị của cột `Continent` từ DataFrame `df`
+    continent_counts = df['Continent'].value_counts()
+
+    # Tạo colormap
+    cmap = cm.get_cmap('Blues')  # Chọn colormap 'Blues'
+    colors = cmap(continent_counts / continent_counts.max()) # Chuẩn hóa dữ liệu để ánh xạ với colormap
+    
+    # Sử dụng `plot(kind='bar')` để tạo biểu đồ hình thanh hiển thị tần số của mỗi châu lục với màu sắc tương ứng
+    continent_counts.plot(kind='bar', color=colors) 
+
+    # Đặt tiêu đề cho biểu đồ là 'Frequency of Continent'
+    plt.title('Frequency of Continent')
+
+    # plt.gca().set_xlabel('Test', rotation='horizontal')
+    
+    # Hiển thị biểu đồ
     st.pyplot(fig)
 
 def plot_emissions_by_continent_and_source(df):
@@ -178,7 +203,7 @@ def plot_emissions_by_continent_and_source(df):
 
 def plot_box_and_histograms(df, columns):
     """Plots boxplots and histograms for specified columns."""
-    st.subheader("6. Boxplots and Histograms for Emission Variables")
+    # st.subheader("6. Boxplots and Histograms for Emission Variables")
     for column in columns:
         st.markdown(f"**{column} Distribution**")
         
@@ -195,14 +220,57 @@ def plot_box_and_histograms(df, columns):
         axes[1].set_xlabel(column)
         axes[1].set_ylabel('Frequency')
         
+        mean_value = df[column].mean()
+        axes[1].axvline(mean_value, color='red', linestyle='dashed', linewidth=1, label=f'Mean: {mean_value:.2f}')
+        axes[1].legend()
+        
         plt.tight_layout()
         st.pyplot(fig)
 
-def descriptive_statistics(df):
-    """Returns descriptive statistics for relevant columns."""
-    st.subheader("7. Descriptive Statistics")
-    stats = df[['Total', 'Solid Fuel', 'Liquid Fuel', 'Gas Fuel', 'Cement', 'Gas Flaring', 'Bunker fuels (Not in Total)']].describe().transpose()
-    st.dataframe(stats.style.format("{:.2f}"))
+
+# def plot_box_and_histograms(df, columns): //box cox transform
+#     """Plots boxplots and histograms for specified columns with Box-Cox Transformation."""
+#     for column in columns:
+#         st.markdown(f"**{column} Distribution Before and After Box-Cox Transformation**")
+        
+#         # Loại bỏ các giá trị NA và đảm bảo dữ liệu > 0
+#         data = df[column].dropna()
+#         data = data[data > 0]  # Box-Cox chỉ áp dụng cho dữ liệu dương
+        
+#         # Áp dụng Box-Cox Transformation
+#         transformed_data, lambda_opt = boxcox(data)
+        
+#         # Tạo subplot cho Before và After
+#         fig, axes = plt.subplots(2, 2, figsize=(14, 10))  
+        
+#         # Boxplot Before
+#         sns.boxplot(data=data, ax=axes[0, 0], color='gray')
+#         axes[0, 0].set_title(f'Boxplot of {column} (Original)')
+        
+#         # Histogram Before
+#         axes[0, 1].hist(data, bins=30, alpha=0.7, color='steelblue')
+#         axes[0, 1].set_title(f'Histogram of {column} (Original)')
+#         mean_value = data.mean()
+#         axes[0, 1].axvline(mean_value, color='red', linestyle='dashed', linewidth=1, label=f'Mean: {mean_value:.2f}')
+#         axes[0, 1].legend()
+        
+#         # Boxplot After Box-Cox
+#         sns.boxplot(data=transformed_data, ax=axes[1, 0], color='lightgreen')
+#         axes[1, 0].set_title(f'Boxplot of {column} (Box-Cox Transformed)')
+        
+#         # Histogram After Box-Cox
+#         axes[1, 1].hist(transformed_data, bins=30, alpha=0.7, color='orange')
+#         axes[1, 1].set_title(f'Histogram of {column} (Box-Cox Transformed)')
+#         mean_transformed = transformed_data.mean()
+#         axes[1, 1].axvline(mean_transformed, color='red', linestyle='dashed', linewidth=1, label=f'Mean: {mean_transformed:.2f}')
+#         axes[1, 1].legend()
+        
+#         # Lambda value
+#         st.write(f"**Optimal Lambda for {column}: {lambda_opt:.2f}**")
+        
+#         plt.tight_layout()
+#         st.pyplot(fig)
+
 
 def plot_correlation_heatmap(df):
     """Plots a heatmap of correlations between emission variables."""
@@ -219,7 +287,7 @@ def analyze_calculated_vs_reported_totals(df):
     
     correlation = df['Total'].corr(df['Calculated Total'])
     
-    st.subheader("9. Analysis of Calculated vs Reported Totals")
+    # st.subheader("9. Analysis of Calculated vs Reported Totals")
     st.write(f"**Correlation between Reported Total and Calculated Total:** {correlation:.4f}")
     
     fig, ax = plt.subplots(figsize=(8, 4))
@@ -242,36 +310,40 @@ def main():
     """)
     
     # Load Data
-    DATA_FILE = "data/raw/fossil_fuel_co2_emissions-by-nation_with_continent.csv"
+    # DATA_FILE = "data/raw/fossil_fuel_co2_emissions-by-nation_with_continent.csv"
+    DATA_FILE = "data/raw/fossil_fuel_co2_emissions_by_nation_with_continent_cleaned.csv"
     df = load_data(DATA_FILE)
     
     if df is not None:
         summarize_data(df)
+        
+        describe_values(df)
         
         check_missing_values(df)
         
         st.header("1. Mean CO2 Emissions Over the Years")
         plot_mean_emissions_per_year(df)
         
-        st.header("2. Total CO2 Emissions by Continent Over Time")
-        plot_total_emissions_by_continent(df)
+        # st.header("2. Total CO2 Emissions by Continent Over Time")
+        # plot_total_emissions_by_continent(df)
         
-        plot_emissions_by_country_in_continent(df)  # Updated function
+        # plot_emissions_by_country_in_continent(df)  # Updated function
         
-        st.header("4. Trends of Emissions by Source Over the Years")
-        plot_emission_trends_by_source(df)
+        # st.header("4. Trends of Emissions by Source Over the Years")
+        # plot_emission_trends_by_source(df)
         
-        st.header("5. Total Emissions by Source for Each Continent")
-        plot_emissions_by_continent_and_source(df)
+        st.header("2. Frequency of Continent")
+        plot_continent_frequency(df)
         
-        plot_box_and_histograms(df, ['Total', 'Solid Fuel', 'Liquid Fuel', 'Gas Fuel', 'Cement', 'Gas Flaring', 'Bunker fuels (Not in Total)'])
+        st.header("3. Distribution of Fossil Fuels CO2 Emissions")
+        # plot_emissions_by_continent_and_source(df)
+        #plot_box_and_histograms(df, ['Total', 'Solid Fuel', 'Liquid Fuel', 'Gas Fuel', 'Cement', 'Gas Flaring', 'Bunker fuels (Not in Total)'])
+        plot_box_and_histograms(df, ['Total'])
         
-        st.header("7. Descriptive Statistics")
-        descriptive_statistics(df)
-        
-        st.header("8. Correlation Heatmap of Emission Variables")
+        st.header("4. Correlation Heatmap of Emission Variables")
         plot_correlation_heatmap(df)
         
+        st.header("5. Analyze the relationship between Total and 5 fossil fuels")
         analyze_calculated_vs_reported_totals(df)
         
         st.markdown("""
